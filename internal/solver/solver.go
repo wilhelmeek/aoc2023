@@ -1,6 +1,6 @@
 package solver
 
 type Solver interface {
-	Solve() error
+	Solve() (string, error)
 	Name() string
 }

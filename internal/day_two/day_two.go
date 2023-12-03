@@ -10,9 +10,9 @@ import (
 	"strings"
 )
 
-type DayTwo struct{}
+type Solution struct{}
 
-func (d DayTwo) Name() string {
+func (d Solution) Name() string {
 	return "Day Two"
 }
 
@@ -47,10 +47,10 @@ func (rd round) sat(r, g, b int) bool {
 	return true
 }
 
-func (d DayTwo) Solve() error {
+func (d Solution) Solve() (string, error) {
 	f, err := os.Open("internal/day_two/input.txt")
 	if err != nil {
-		return fmt.Errorf("opening file: %w", err)
+		return "", fmt.Errorf("opening file: %w", err)
 	}
 	defer f.Close()
 
@@ -62,7 +62,7 @@ func (d DayTwo) Solve() error {
 
 	expr, err := regexp.Compile("Game (\\d*): (.*)")
 	if err != nil {
-		return fmt.Errorf("compiling regexp: %w", err)
+		return "", fmt.Errorf("compiling regexp: %w", err)
 	}
 
 	var satSum, minSum int
@@ -71,12 +71,12 @@ func (d DayTwo) Solve() error {
 
 		sm := expr.FindStringSubmatch(r)
 		if len(sm) != 3 {
-			return fmt.Errorf("getting submatch: %w", err)
+			return "", fmt.Errorf("getting submatch: %w", err)
 		}
 
 		id, err := strconv.Atoi(sm[1])
 		if err != nil {
-			return fmt.Errorf("parsing id: %w", err)
+			return "", fmt.Errorf("parsing id: %w", err)
 		}
 
 		for _, r := range strings.Split(sm[2], "; ") {
@@ -84,12 +84,12 @@ func (d DayTwo) Solve() error {
 			for _, t := range strings.Split(r, ", ") {
 				tup := strings.Split(t, " ")
 				if len(tup) != 2 {
-					return fmt.Errorf("round must have count and color")
+					return "", fmt.Errorf("round must have count and color")
 				}
 				col := tup[1]
 				ct, err := strconv.Atoi(tup[0])
 				if err != nil {
-					return fmt.Errorf("parsing to int: %w", err)
+					return "", fmt.Errorf("parsing to int: %w", err)
 				}
 				switch col {
 				case "red":
@@ -109,8 +109,5 @@ func (d DayTwo) Solve() error {
 		}
 	}
 
-	fmt.Println(fmt.Sprintf("Sum of satisfiable sets: %v", satSum))
-	fmt.Println(fmt.Sprintf("Sum of min-set round powers %v", minSum))
-
-	return nil
+	return fmt.Sprintf("Part 1: %d\nPart 2: %d", satSum, minSum), nil
 }

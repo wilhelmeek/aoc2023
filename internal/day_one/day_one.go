@@ -22,16 +22,16 @@ var nums = []string{
 	"nine",
 }
 
-type DayOne struct{}
+type Solution struct{}
 
-func (d DayOne) Name() string {
+func (d Solution) Name() string {
 	return "Day One"
 }
 
-func (d DayOne) Solve() error {
+func (d Solution) Solve() (string, error) {
 	f, err := os.Open("internal/day_one/input.txt")
 	if err != nil {
-		return fmt.Errorf("opening file: %w", err)
+		return "", fmt.Errorf("opening file: %w", err)
 	}
 	defer f.Close()
 
@@ -85,13 +85,11 @@ func (d DayOne) Solve() error {
 
 		tup, err := strconv.Atoi(string(fr) + string(lr))
 		if err != nil {
-			return fmt.Errorf("opening file: %w", err)
+			return "", fmt.Errorf("opening file: %w", err)
 		}
 
 		sum += tup
 	}
 
-	fmt.Println(sum)
-
-	return nil
+	return strconv.Itoa(sum), nil
 }
