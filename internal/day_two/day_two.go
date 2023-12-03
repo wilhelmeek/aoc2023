@@ -65,8 +65,7 @@ func (d DayTwo) Solve() error {
 		return fmt.Errorf("compiling regexp: %w", err)
 	}
 
-	var satSum int
-	var minSum int
+	var satSum, minSum int
 	for _, r := range rows {
 		rd := round{}
 
@@ -104,11 +103,10 @@ func (d DayTwo) Solve() error {
 			rd = append(rd, s)
 		}
 
+		minSum += rd.min().pow()
 		if rd.satisfiable(12, 13, 14) {
 			satSum += id
 		}
-
-		minSum += rd.min().pow()
 	}
 
 	fmt.Println(fmt.Sprintf("Sum of satisfiable sets: %v", satSum))
