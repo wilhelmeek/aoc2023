@@ -16,14 +16,14 @@ func (d DayTwo) Name() string {
 	return "Day Two"
 }
 
-type set struct{ red, green, blue int }
+type set struct{ r, g, b int }
 
-func (s set) satisfiable(r, g, b int) bool {
-	return s.red <= r && s.green <= g && s.blue <= b
+func (s set) sat(r, g, b int) bool {
+	return s.r <= r && s.g <= g && s.b <= b
 }
 
 func (s set) pow() int {
-	return s.red * s.green * s.blue
+	return s.r * s.g * s.b
 }
 
 type round []set
@@ -31,16 +31,16 @@ type round []set
 func (rd round) min() set {
 	var r, g, b float64
 	for _, s := range rd {
-		r = math.Max(float64(s.red), r)
-		g = math.Max(float64(s.green), g)
-		b = math.Max(float64(s.blue), b)
+		r = math.Max(float64(s.r), r)
+		g = math.Max(float64(s.g), g)
+		b = math.Max(float64(s.b), b)
 	}
-	return set{red: int(r), green: int(g), blue: int(b)}
+	return set{r: int(r), g: int(g), b: int(b)}
 }
 
-func (rd round) satisfiable(r, g, b int) bool {
+func (rd round) sat(r, g, b int) bool {
 	for _, s := range rd {
-		if !s.satisfiable(r, g, b) {
+		if !s.sat(r, g, b) {
 			return false
 		}
 	}
@@ -80,7 +80,7 @@ func (d DayTwo) Solve() error {
 		}
 
 		for _, r := range strings.Split(sm[2], "; ") {
-			s := set{}
+			var s set
 			for _, t := range strings.Split(r, ", ") {
 				tup := strings.Split(t, " ")
 				if len(tup) != 2 {
@@ -93,18 +93,18 @@ func (d DayTwo) Solve() error {
 				}
 				switch col {
 				case "red":
-					s.red += ct
+					s.r += ct
 				case "green":
-					s.green += ct
+					s.g += ct
 				case "blue":
-					s.blue += ct
+					s.b += ct
 				}
 			}
 			rd = append(rd, s)
 		}
 
 		minSum += rd.min().pow()
-		if rd.satisfiable(12, 13, 14) {
+		if rd.sat(12, 13, 14) {
 			satSum += id
 		}
 	}
