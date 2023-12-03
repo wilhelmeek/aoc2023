@@ -68,7 +68,7 @@ func Solve() {
 
 		var fr, lr rune
 		for _, r := range w {
-			if !unicode.IsNumber(r) {
+			if !unicode.IsDigit(r) {
 				continue
 			}
 			lr = r
