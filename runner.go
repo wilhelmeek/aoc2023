@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"log"
 
-	dayone "github.com/wilhelmeek/aoc2023/internal/day_one"
-	daytwo "github.com/wilhelmeek/aoc2023/internal/day_one/day_two"
+	daytwo "github.com/wilhelmeek/aoc2023/internal/day_two"
 	"github.com/wilhelmeek/aoc2023/internal/solver"
 )
 
 func main() {
 	solvers := []solver.Solver{
-		dayone.DayOne{},
 		daytwo.DayTwo{},
 	}
 
