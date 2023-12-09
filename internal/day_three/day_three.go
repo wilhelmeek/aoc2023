@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"unicode"
 )
 
 type Solution struct{}
@@ -12,58 +14,118 @@ func (sl Solution) Name() string {
 	return "Day Three"
 }
 
-type val string
+type row []rune
+type val rune
 
 func (v val) number() bool {
-	return true
+	return unicode.IsNumber(rune(v))
+}
+
+func (v val) symbol() bool {
+	if v == 0 {
+		return false
+	}
+	if v == '.' {
+		return false
+	}
+	return !unicode.IsDigit(rune(v))
 }
 
 type schematic struct {
-	ubX, ubY int
-	rows     []val
+	lbX, lbY, ubX, ubY int
+	rows               []row
 }
 
-func newSchematic(rows []string) schematic {
+func newSchematic(rows []row) schematic {
 	return schematic{
+		lbX:  0,
+		lbY:  0,
 		ubX:  len(rows[0]) - 1,
 		ubY:  len(rows) - 1,
 		rows: rows,
 	}
 }
 
-func (s schematic) neighbours(x, y int) (int, error) {
-	v, err := s.at(x, y)
-	if err != nil {
-		return 0, fmt.Errorf("getting pos: %w", err)
-	}
-
-	return 0, nil
+func (s schematic) symbolAdj(x, y int) bool {
+	return false ||
+		s.at(x-1, y).symbol() ||
+		s.at(x+1, y).symbol() ||
+		s.at(x, y-1).symbol() ||
+		s.at(x, y+1).symbol() ||
+		s.at(x+1, y+1).symbol() ||
+		s.at(x+1, y-1).symbol() ||
+		s.at(x-1, y+1).symbol() ||
+		s.at(x-1, y-1).symbol()
 }
 
-func (s schematic) at(x, y int) (string, error) {
+func (s schematic) parts() []string {
+	var parts []string
+
+	var part []rune
+	var symAdj bool
+	for yIdx, r := range s.rows {
+		for xIdx, v := range r {
+			if val(v).number() {
+				part = append(part, v)
+				if s.symbolAdj(xIdx, yIdx) {
+					symAdj = true
+				}
+			}
+			if len(part) != 0 {
+				// Moving out of number
+				if !val(v).number() || xIdx == s.ubX {
+					if symAdj {
+						parts = append(parts, string(part))
+					}
+					part = nil
+					symAdj = false
+				}
+			}
+		}
+	}
+
+	return parts
+}
+
+func (s schematic) at(x, y int) (v val) {
 	if x > s.ubX {
-		return "", fmt.Errorf(fmt.Sprintf("upper x is %q", s.ubX))
+		return
+	}
+	if x < s.lbX {
+		return
 	}
 	if y > s.ubY {
-		return "", fmt.Errorf(fmt.Sprintf("upper y is %q", s.ubY))
+		return
 	}
-	return string(s.rows[y][x]), nil
+	if y < s.lbY {
+		return
+	}
+	return val(s.rows[y][x])
 }
 
 func (sl Solution) Solve() (string, error) {
-	f, err := os.Open("internal/day_two/input.txt")
+	f, err := os.Open("internal/day_three/input.txt")
 	if err != nil {
 		return "", fmt.Errorf("opening file: %w", err)
 	}
 	defer f.Close()
 
-	rows := []string{}
+	rows := []row{}
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
-		rows = append(rows, sc.Text())
+		rows = append(rows, row(sc.Text()))
 	}
 
-	newSchematic(rows)
+	s := newSchematic(rows)
 
-	return "", nil
+	var sum int
+	for _, p := range s.parts() {
+		v, err := strconv.Atoi(p)
+		if err != nil {
+			return "", fmt.Errorf("converting part: %w", err)
+		}
+		sum += v
+	}
+
+	return fmt.Sprintf("Sum of parts: %v", sum), nil
 }
