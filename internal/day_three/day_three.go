@@ -93,11 +93,9 @@ func (s *schematic) gear(x, y int) *gear {
 	k := fmt.Sprintf("%v,%v", x, y)
 
 	if s.at(x, y).gear() {
-		g := s.gears[k]
-		if g == nil {
-			g = &gear{nums: map[int]int{}}
+		if s.gears[k] == nil {
+			s.gears[k] = &gear{nums: map[int]int{}}
 		}
-		s.gears[k] = g
 	}
 
 	return s.gears[k]
