@@ -14,7 +14,6 @@ func (sl Solution) Name() string {
 	return "Day Three"
 }
 
-type row []rune
 type val rune
 type gear struct{ nums map[int]int }
 
@@ -38,12 +37,12 @@ func (v val) gear() bool {
 
 type schematic struct {
 	lbX, lbY, ubX, ubY int
-	rows               []row
+	rows               [][]rune
 	gears              map[string]*gear
 	parts              []int
 }
 
-func newSchematic(rows []row) schematic {
+func newSchematic(rows [][]rune) (schematic, error) {
 	s := schematic{
 		lbX:   0,
 		lbY:   0,
@@ -72,9 +71,8 @@ func newSchematic(rows []row) schematic {
 					if partSymAdj {
 						p, err := strconv.Atoi(string(part))
 						if err != nil {
-							panic("handle me")
+							return schematic{}, fmt.Errorf("converting part to int: %w", err)
 						}
-
 						s.parts = append(s.parts, p)
 						for _, g := range partGears {
 							g.add(p)
@@ -88,7 +86,7 @@ func newSchematic(rows []row) schematic {
 		}
 	}
 
-	return s
+	return s, nil
 }
 
 func (s *schematic) gear(x, y int) *gear {
@@ -152,13 +150,16 @@ func (sl Solution) Solve() (string, error) {
 	}
 	defer f.Close()
 
-	rows := []row{}
+	rows := [][]rune{}
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
-		rows = append(rows, row(sc.Text()))
+		rows = append(rows, []rune(sc.Text()))
 	}
 
-	s := newSchematic(rows)
+	s, err := newSchematic(rows)
+	if err != nil {
+		return "", fmt.Errorf("creating schematic: %w", err)
+	}
 
 	var sum int
 	for _, p := range s.parts {
